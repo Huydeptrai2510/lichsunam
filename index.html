@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quiz ôn tập Lịch sử 11</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--ink:#182238;--accent:#3157d5;--muted:#68738a;--good:#18794e;--bad:#b42318}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;color:var(--ink)}
+header{background:linear-gradient(120deg,#203b91,#5478ee);color:white;padding:28px 18px}
+.wrap{max-width:850px;margin:auto;padding:0 14px}h1{font-size:clamp(24px,5vw,34px);margin:0 0 8px}header p{margin:0;opacity:.92}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}.toolbar button,.mainbtn{border:0;border-radius:12px;padding:11px 15px;background:var(--accent);color:white;font-weight:700;cursor:pointer}.toolbar button.secondary{background:#e5eaff;color:#243d9c}
+.progress{height:8px;background:#dce2f0;border-radius:99px;overflow:hidden;margin:12px 0 18px}.bar{height:100%;background:#3157d5;width:0}
+.q{background:var(--card);border:1px solid #e4e8f1;border-radius:16px;padding:18px;margin:14px 0;box-shadow:0 4px 16px #1725540a}.q h3{font-size:17px;margin:0 0 12px}.option{display:flex;gap:10px;padding:10px 12px;border:1px solid #e2e7f0;border-radius:11px;margin:8px 0;cursor:pointer}.option:hover{background:#f4f6ff}.option input{margin-top:5px;accent-color:var(--accent)}.option.correct{border-color:#50a77d;background:#eaf8f0}.option.wrong{border-color:#e17c76;background:#fff0ef}.explain{font-size:14px;color:var(--muted);margin-top:10px;display:none}.show .explain{display:block}.result{display:none;background:white;border-radius:16px;padding:20px;margin:18px 0;border:1px solid #e1e6f0}.result h2{margin-top:0}.small{font-size:13px;color:var(--muted)}footer{padding:25px 0 40px;text-align:center;color:var(--muted)}
+@media(max-width:520px){.q{padding:14px}.toolbar button{flex:1}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><h1>Ôn tập giữa học kì I · Lịch sử 11</h1><p>Trắc nghiệm tương tác • Chọn đáp án, nộp bài và xem lại câu sai</p></div></header>
+<main class="wrap">
+<div class="toolbar">
+<button class="secondary" onclick="shuffleQuiz()">🔀 Đảo câu hỏi</button>
+<button class="secondary" onclick="resetQuiz()">↻ Làm lại</button>
+<button onclick="submitQuiz()">Nộp bài & chấm điểm</button>
+</div>
+<div class="small" id="progressText">Đã trả lời 0 câu</div><div class="progress"><div class="bar" id="bar"></div></div>
+<div id="quiz"></div>
+<section class="result" id="result" aria-live="polite"></section>
+<footer>Quiz được tạo từ ảnh đề cương bạn cung cấp. Hãy đối chiếu với tài liệu gốc nếu câu chữ trong ảnh chưa rõ.</footer>
+</main>
+<script>
+const questions = [
+{n:1,q:"Mục tiêu chung của các cuộc cách mạng tư sản thế kỉ XVI–XVIII là gì?",o:["Lật đổ chế độ phong kiến, thực dân cùng tàn tích của nó.","Lật đổ chế độ phong kiến, cổ vũ quân tản tích của nó.","Tạo điều kiện cho sự phát triển của chế độ phong kiến.","Mở đường cho sự phát triển của chủ nghĩa xã hội."],a:0},
+{n:2,q:"Các cuộc cách mạng tư sản thế kỉ XVI–XVIII có hai nhiệm vụ cơ bản là",o:["Dân tộc và dân chủ.","Dân tộc và dân sinh.","Độc lập và tự do.","Dân chủ và dân quyền."],a:0},
+{n:3,q:"Một trong những lực lượng lãnh đạo chủ yếu của các cuộc cách mạng tư sản thế kỉ XVI–XVIII là",o:["Tư sản.","Công nhân.","Nông dân.","Địa chủ."],a:0},
+{n:4,q:"Lãnh đạo của cuộc cách mạng tư sản Anh thế kỉ XVII là",o:["Tư sản và chủ nô.","Tư sản và quý tộc mới.","Tăng lữ và quý tộc.","Chủ nô và quý tộc."],a:1},
+{n:5,q:"Nội dung nào sau đây không phải là mục tiêu của các cuộc cách mạng tư sản thế kỉ XVI–XVIII?",o:["Lật đổ chế độ phong kiến, thực dân cùng tàn tích của nó.","Tạo điều kiện cho sự phát triển của kinh tế tư bản chủ nghĩa.","Thiết lập nền thống trị của giai cấp tư sản và liên minh của họ.","Mở ra thời đại thắng lợi của chế độ xã hội chủ nghĩa."],a:3},
+{n:6,q:"Lãnh đạo các cuộc cách mạng tư sản từ thế kỉ XVII đến thế kỉ XVIII không bao gồm lực lượng nào?",o:["Tư sản.","Quý tộc mới.","Chủ nô.","Công nhân."],a:3},
+{n:7,q:"Nội dung nào là tiền đề về kinh tế dẫn đến sự bùng nổ và thắng lợi của các cuộc cách mạng tư sản thế kỉ XVII–XVIII?",o:["Quan hệ sản xuất tư bản chủ nghĩa thay thế hoàn toàn quan hệ phong kiến.","Triết học Ánh sáng ra đời, thức tỉnh quần chúng đấu tranh.","Giai cấp tư sản và đồng minh có lực lượng kinh tế, chính trị mạnh.","Kinh tế tư bản chủ nghĩa ra đời và phát triển trong lòng chế độ phong kiến."],a:3},
+{n:8,q:"Đầu thế kỉ XIX, các nước Mĩ Latinh giành độc lập từ tay thực dân",o:["Tây Ban Nha và Bồ Đào Nha.","Anh và đế quốc Mĩ.","Tây Ban Nha và Pháp.","Pháp và Đức."],a:0},
+{n:9,q:"Chủ nghĩa tư bản hiện đại là thuật ngữ dùng để chỉ chủ nghĩa tư bản",o:["Trong giai đoạn tự do cạnh tranh.","Bắt đầu chuyển sang giai đoạn độc quyền.","Từ sau Chiến tranh thế giới thứ II đến nay.","Từ sau Chiến tranh thế giới thứ I đến nay."],a:2},
+{n:10,q:"Một trong những thách thức mà chủ nghĩa tư bản hiện đại phải đối mặt là",o:["Tiềm ẩn nguy cơ các khủng hoảng tài chính mang tính toàn cầu.","Sức sản xuất của các ngành kinh tế ngày càng cao.","Khoa học công nghệ phát triển và ngày càng mở rộng.","Lực lượng lao động có chất lượng ngày càng cao."],a:0},
+{n:11,q:"Cuối thế kỉ XIX – đầu thế kỉ XX, các nước tư bản chủ nghĩa chuyển sang giai đoạn",o:["Tự do cạnh tranh.","Cải cách đất nước.","Đế quốc chủ nghĩa.","Chủ nghĩa phát xít."],a:2},
+{n:12,q:"Chủ nghĩa đế quốc ra đời từ cuối thế kỉ XIX đầu thế kỉ XX là hệ quả trực tiếp của quá trình",o:["Xâm lược thuộc địa.","Giao lưu buôn bán.","Toàn cầu hóa.","Hợp tác kinh tế."],a:0},
+{n:13,q:"Đến cuối thế kỉ XIX, các nước đế quốc thiết lập hệ thống thuộc địa rộng khắp ở",o:["Châu Âu, châu Mỹ và Tây Âu.","Châu Âu, châu Úc và Bắc Mỹ.","Châu Á, châu Phi và khu vực Mỹ La-tinh.","Châu Mỹ, Tây Âu và Đông Âu."],a:2},
+{n:14,q:"Đầu thế kỉ XX, quốc gia nào có hệ thống thuộc địa rộng lớn nhất?",o:["Đức.","I-ta-li-a.","Nhật.","Anh."],a:3},
+{n:15,q:"Các tổ chức độc quyền ra đời ở các nước tư bản cuối thế kỉ XIX – đầu thế kỉ XX là kết quả của sự liên minh giữa",o:["Vô sản và tư sản.","Chủ nô và tư sản.","Các nhà tư bản lớn.","Địa chủ và quý tộc."],a:2},
+{n:16,q:"Cuối thế kỉ XIX, sự tập trung sản xuất và tích tụ cao độ đã đưa chủ nghĩa tư bản chuyển sang giai đoạn",o:["Độc quyền.","Tự do cạnh tranh.","Hòa hoãn.","Hợp tác."],a:0},
+{n:17,q:"Cuối thế kỉ XIX, quốc gia nào đã bành trướng và can thiệp nội bộ nhiều nước khu vực Mỹ La-tinh?",o:["Tây Ban Nha.","Bồ Đào Nha.","Anh.","Mĩ."],a:3},
+{n:18,q:"Một đặc điểm nổi bật của chủ nghĩa tư bản độc quyền cuối thế kỉ XIX – đầu thế kỉ XX là sự hình thành của các",o:["Công ty xuyên quốc gia.","Tổ chức độc quyền.","Tổ chức liên kết khu vực.","Tổ chức liên kết quốc tế."],a:1},
+{n:19,q:"Lĩnh vực nào sau đây là tiềm năng phát triển của chủ nghĩa tư bản hiện đại?",o:["Chạy đua vũ trang.","Sự bình đẳng xã hội.","Cơ cấu giai cấp xã hội.","Khoa học – công nghệ."],a:3},
+{n:20,q:"Nội dung nào tạo cơ sở cho bước chuyển từ chủ nghĩa tư bản tự do cạnh tranh sang độc quyền?",o:["Quá trình hợp tác ở các nước tư bản.","Sự phát triển của các tổ chức độc quyền.","Nhiều trung tâm kinh tế – tài chính ra đời.","Sự ra đời nhiều tổ chức liên kết khu vực."],a:1},
+{n:21,q:"Ngay sau khi thành lập (1917), chính quyền Xô viết ở Nga do Lê-nin đứng đầu đã",o:["Ban hành Sắc lệnh hòa bình và Sắc lệnh ruộng đất.","Giúp các nước xã hội chủ nghĩa xây dựng đất nước.","Tiến hành cải tổ toàn diện đất nước.","Lãnh đạo nhân dân lật đổ chế độ Nga hoàng."],a:0},
+{n:22,q:"Quốc gia nào thành lập nhà nước chuyên chính vô sản đầu tiên trên thế giới?",o:["Trung Quốc.","Pháp.","Liên Xô.","Mĩ."],a:2},
+{n:23,q:"Một trong những quốc gia đầu tiên gia nhập Liên bang Cộng hòa xã hội chủ nghĩa Xô viết năm 1922 là",o:["Nga.","Nhật Bản.","Campuchia.","Lào."],a:0},
+{n:24,q:"Năm 1924, Hiến pháp đầu tiên của Liên Xô đã",o:["Hoàn thành quá trình thành lập nhà nước Liên Xô.","Kết thúc cuộc chiến tranh bảo vệ Tổ quốc.","Giải quyết yêu cầu hòa bình cho nhân dân.","Giải quyết vấn đề ruộng đất cho nông dân."],a:0},
+{n:25,q:"Sự ra đời của Liên bang Cộng hòa xã hội chủ nghĩa Xô viết (1922) đã",o:["Giải phóng các dân tộc trên toàn thế giới.","Liên kết phong trào công nhân các nước tư bản.","Tạo sức mạnh tổng hợp để xây dựng đất nước.","Dập tan âm mưu xâm lược của các đế quốc."],a:2},
+{n:26,q:"Một trong những tư tưởng chỉ đạo của Lê-nin trong việc thành lập Liên bang Xô viết năm 1922 là",o:["Sự bình đẳng về mọi mặt.","Phân biệt về tôn giáo.","Đồng hóa về văn hóa.","Phân biệt về chủng tộc."],a:0},
+{n:27,q:"Đối với Liên Xô, sự ra đời của Liên bang Cộng hòa xã hội chủ nghĩa Xô viết không có ý nghĩa nào sau đây?",o:["Thể hiện sức mạnh đoàn kết, giúp đỡ nhau giữa các dân tộc Xô viết.","Phù hợp lợi ích chung của các dân tộc trên đất nước Xô viết.","Tăng cường vị thế của Liên Xô trên trường quốc tế.","Tạo tiền đề cho sự ra đời hệ thống xã hội chủ nghĩa trên thế giới."],a:3},
+{n:28,q:"Nội dung nào phản ánh đúng sự ra đời của Liên bang Cộng hòa xã hội chủ nghĩa Xô viết năm 1922?",o:["Phù hợp với lợi ích chung của các dân tộc trên đất nước Xô viết.","Phù hợp với xu thế phát triển chung của thế giới lúc bấy giờ.","Đáp ứng nhiệm vụ cấp bách trong đấu tranh chống ngoại xâm.","Chưa phù hợp với nguyện vọng các dân tộc Xô viết."],a:0},
+{n:29,q:"Đối với thế giới, sự ra đời của Liên bang Xô viết không có ý nghĩa nào sau đây?",o:["Tăng cường vị thế Liên Xô trên trường quốc tế.","Cổ vũ phong trào giải phóng dân tộc trên thế giới.","Để lại nhiều bài học kinh nghiệm quý báu về mô hình nhà nước.","Chứng minh học thuyết Mác – Lê-nin là đúng đắn, khoa học."],a:0},
+{n:30,q:"Khi mới thành lập, Liên bang Xô viết gồm 4 nước cộng hòa là",o:["Nga, U-crai-na, Bê-lô-rút-xi-a và Ngoại Cáp-ca-dơ.","Nga, Hung-ga-ri, Bê-lô-rút-xi-a và Ngoại Cáp-ca-dơ.","Nga, Hung-ga-ri, Bung-ga-ri và Ngoại Cáp-ca-dơ.","Liên Xô, Hung-ga-ri, Bung-ga-ri và Ngoại Cáp-ca-dơ."],a:0},
+{n:31,q:"Quốc gia nào ở Mỹ La-tinh chọn con đường phát triển lên chủ nghĩa xã hội?",o:["Cuba.","Bra-xin.","Argentina.","Mê-hi-cô."],a:0},
+{n:32,q:"Nhiệm vụ chủ yếu của các nước Đông Âu từ năm 1950 đến đầu những năm 70 của thế kỉ XX là",o:["Xây dựng chủ nghĩa xã hội.","Lật đổ chế độ quân chủ chuyên chế.","Đánh bại chủ nghĩa phát xít.","Lật đổ chế độ thực dân kiểu mới."],a:0},
+{n:33,q:"Tháng 12-1975, nhà nước nào được thành lập và đi lên xây dựng chủ nghĩa xã hội?",o:["Cộng hòa nhân dân Trung Hoa.","Cộng hòa In-đô-nê-xi-a.","Cộng hòa Dân chủ nhân dân Lào.","Cộng hòa Nhân dân Campuchia."],a:2},
+{n:34,q:"Chính sách đối ngoại của Trung Quốc từ những năm 80 thế kỉ XX là",o:["Thiết lập quan hệ đối tác chiến lược với tất cả quốc gia.","Thực hiện chính sách cấm vận Đông Nam Á.","Đa dạng hóa, đa phương hóa quan hệ với các nước.","Bắt tay với Mĩ chống Liên Xô và Tây Âu."],a:2},
+{n:35,q:"Mục tiêu chủ yếu của công cuộc cải cách, mở cửa ở Trung Quốc (1978) là",o:["Đưa Trung Quốc thành quốc gia giàu mạnh, dân chủ, văn minh.","Mở rộng hợp tác toàn diện với các nước tư bản phát triển.","Hoàn thành triệt để cách mạng dân tộc dân chủ nhân dân.","Phát triển kinh tế xã hội chủ nghĩa bằng mọi giá."],a:0},
+{n:36,q:"Nguyên nhân khách quan dẫn đến sự sụp đổ của chủ nghĩa xã hội ở Liên Xô và Đông Âu là",o:["Đường lối lãnh đạo chủ quan, duy ý chí.","Chưa khai thác tốt thành tựu khoa học kĩ thuật.","Công cuộc cải tổ đất nước có nhiều sai lầm.","Sự chống phá quyết liệt của các thế lực thù địch."],a:3},
+{n:37,q:"Một nguyên nhân chủ quan dẫn đến sự sụp đổ của chế độ xã hội chủ nghĩa ở Liên Xô và Đông Âu là",o:["Sự chống phá của các thế lực thù địch.","Đường lối lãnh đạo chủ quan, duy ý chí.","Không chịu tiến hành cải tổ đất nước.","Niềm tin của các tầng lớp nhân dân suy giảm."],a:1},
+{n:38,q:"Về chính trị, công cuộc cải cách mở cửa của Trung Quốc (1978) đạt thành tựu nổi bật nào?",o:["Xây dựng hệ thống lí luận chủ nghĩa xã hội đặc sắc Trung Quốc.","Duy trì tốc độ tăng trưởng kinh tế cao liên tục nhiều năm.","Đời sống nhân dân ngày càng được cải thiện.","Trở thành cường quốc xuất khẩu vũ khí."],a:0},
+{n:39,q:"Tháng 12-1978, quốc gia nào thực hiện cải cách, mở cửa đạt thành tựu to lớn về kinh tế – xã hội?",o:["Liên Xô.","Cu-ba.","Ấn Độ.","Trung Quốc."],a:3},
+{n:40,q:"Thành tựu nào sau đây của Trung Quốc trong công cuộc cải cách, mở cửa?",o:["Có tàu đưa con người bay vào vũ trụ.","Đưa con người lên Mặt Trăng.","Hoàn thành công cuộc chống chủ nghĩa phân biệt chủng tộc.","Xóa bỏ được tình trạng tham nhũng."],a:0},
+{n:41,q:"Nội dung nào không phản ánh đúng thành tựu nhân dân Trung Quốc đạt được từ cải cách mở cửa (1978 đến nay)?",o:["Đời sống vật chất và tinh thần được cải thiện, nâng cao.","Xây dựng nền kinh tế kế hoạch tập trung, quan liêu, bao cấp.","Trung Quốc vươn lên thành nền kinh tế có quy mô lớn thứ hai thế giới.","Mở rộng quan hệ hợp tác quốc tế."],a:1},
+{n:42,q:"Tác động tích cực của chính sách cai trị thực dân phương Tây đến khu vực Đông Nam Á là",o:["Kinh tế phát triển với tốc độ nhanh, quy mô lớn.","Gắn kết Đông Nam Á với thị trường thế giới.","Đặt cơ sở hình thành nền văn hóa truyền thống.","Giải quyết triệt để các mâu thuẫn trong xã hội."],a:1},
+{n:43,q:"Ý nào không phải là ý nghĩa đối với trong nước của việc thành lập Liên bang Cộng hòa xã hội chủ nghĩa Xô viết?",o:["Mở ra con đường giải quyết đúng đắn vấn đề dân tộc trên cơ sở bình đẳng, giúp đỡ nhau.","Phù hợp lợi ích chung các dân tộc Xô viết, tạo điều kiện phát triển kinh tế, xã hội.","Tăng cường vị thế của Liên Xô trên trường quốc tế.","Tạo sức mạnh đoàn kết giữa các dân tộc Xô viết."],a:2}
+];
+let current = questions.slice(), submitted=false;
+function render(){const root=document.getElementById('quiz');root.innerHTML='';submitted=false;document.getElementById('result').style.display='none';
+current.forEach((q,i)=>{let el=document.createElement('section');el.className='q';el.id='q'+i;
+el.innerHTML=`<h3>Câu ${q.n}. ${q.q}</h3>`+q.o.map((opt,j)=>`<label class="option"><input type="radio" name="q${i}" value="${j}"><span><b>${'ABCD'[j]}.</b> ${opt}</span></label>`).join('')+`<div class="explain">Đáp án đúng: <b>${'ABCD'[q.a]}</b>.</div>`;
+root.appendChild(el);});
+root.querySelectorAll('input').forEach(x=>x.addEventListener('change',updateProgress));updateProgress();}
+function updateProgress(){let count=current.filter((q,i)=>document.querySelector(`input[name="q${i}"]:checked`)).length;document.getElementById('progressText').textContent=`Đã trả lời ${count}/${current.length} câu`;document.getElementById('bar').style.width=(count/current.length*100)+'%';}
+function submitQuiz(){let score=0,unanswered=0;current.forEach((q,i)=>{let el=document.getElementById('q'+i);el.classList.add('show');let chosen=document.querySelector(`input[name="q${i}"]:checked`);if(!chosen)unanswered++;else if(+chosen.value===q.a)score++;el.querySelectorAll('.option').forEach((op,j)=>{op.classList.remove('correct','wrong');if(j===q.a)op.classList.add('correct');if(chosen&&j===+chosen.value&&j!==q.a)op.classList.add('wrong');});el.querySelectorAll('input').forEach(x=>x.disabled=true);});
+let r=document.getElementById('result');r.style.display='block';r.innerHTML=`<h2>Kết quả: ${score}/${current.length} câu (${Math.round(score/current.length*100)}%)</h2><p>Chưa trả lời: ${unanswered} câu. Đáp án đúng được tô xanh; lựa chọn sai được tô đỏ.</p><button class="mainbtn" onclick="resetQuiz()">Làm lại từ đầu</button>`;r.scrollIntoView({behavior:'smooth'});submitted=true;}
+function resetQuiz(){current=questions.slice();render();window.scrollTo({top:0,behavior:'smooth'});}
+function shuffleQuiz(){current=questions.slice().sort(()=>Math.random()-.5);render();window.scrollTo({top:0,behavior:'smooth'});}
+render();
+</script>
+</body></html>
